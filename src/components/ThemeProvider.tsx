@@ -4,6 +4,7 @@ export interface ThemeIcon {
   name: string;
   icon: React.ReactNode;
 }
+
 interface ThemeContextObject {
   theme: string;
   setTheme(theme: string): void;
@@ -15,6 +16,13 @@ export interface ThemeProviderProps {
   children?: React.ReactNode;
   additionalThemes?: ThemeIcon[]; //Themes that are merged with defaultThemes
   replaceThemes?: ThemeIcon[]; //Themes that replace default themes (replaceThemes takes precedence if both replaceThemes and additionalThemes are specified)
+}
+
+export interface LocalThemeProps {
+  theme: string;
+  children?: React.ReactNode;
+  otherProps?: any[];
+  as?: any;
 }
 
 const ThemeContext = createContext<ThemeContextObject>(null!);
@@ -42,7 +50,7 @@ function modifyDOM(theme: string) {
   }
 }
 
-export default function ThemeProvider({
+export function ThemeProvider({
   theme, // Overrides with this initial theme
   children,
   additionalThemes, //Themes that are merged with defaultThemes
@@ -88,7 +96,10 @@ export default function ThemeProvider({
   );
 }
 
-export function useTheme(): any[] {
+export function useTheme(): [
+  theme: string,
+  setTheme: { (data: string): void }
+] {
   const context = useContext(ThemeContext);
 
   // if `undefined`, throw an error
@@ -106,13 +117,6 @@ export function useThemeList(): ThemeIcon[] {
     throw new Error('useThemeList() was used outside of its Provider');
   }
   return context.themes;
-}
-
-export interface LocalThemeProps {
-  theme: string;
-  children?: React.ReactNode;
-  otherProps?: any[];
-  as?: any;
 }
 
 export function LocalTheme({
